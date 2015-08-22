@@ -3,15 +3,20 @@
     package="hackthon.ntu.strayhackathon" >
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
+        <!-- http://stackoverflow.com/questions/17919656/android-webview-resize-after-orientation-without-reload-the-page -->
         <activity
             android:name=".MainActivity"
-            android:label="@string/app_name" >
+            android:label="@string/app_name"
+            android:configChanges="orientation|screenSize"
+            android:windowSoftInputMode="adjustResize" >
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

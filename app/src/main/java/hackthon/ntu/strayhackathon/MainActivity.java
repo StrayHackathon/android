@@ -5,6 +5,8 @@ import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.webkit.GeolocationPermissions;
+import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -12,16 +14,46 @@ import android.webkit.WebViewClient;
 
 public class MainActivity extends Activity {
 
+    // https://turbomanage.wordpress.com/2012/04/23/how-to-enable-geolocation-in-a-webview-android/
+    /**
+     * WebViewClient subclass loads all hyperlinks in the existing WebView
+     */
+    public class GeoWebViewClient extends WebViewClient {
+        @Override
+        public boolean shouldOverrideUrlLoading(WebView view, String url) {
+            // When user clicks a hyperlink, load in the existing WebView
+            view.loadUrl(url);
+            return true;
+        }
+    }
+
+    /**
+     * WebChromeClient subclass handles UI-related calls
+     * Note: think chrome as in decoration, not the Chrome browser
+     */
+    public class GeoWebChromeClient extends WebChromeClient {
+        @Override
+        public void onGeolocationPermissionsShowPrompt(String origin,
+                                                       GeolocationPermissions.Callback callback) {
+            // Always grant permission since the app itself requires location
+            // permission and the user has therefore already granted it
+            callback.invoke(origin, true, false);
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        WebView view = (WebView)findViewById(R.id.webView);
-        WebSettings settings = view.getSettings();
+        webView = (WebView)findViewById(R.id.webView);
+        WebSettings settings = webView.getSettings();
+        settings.setJavaScriptCanOpenWindowsAutomatically(true);
         settings.setJavaScriptEnabled(true);
-        view.setWebViewClient(new WebViewClient());
+        settings.setGeolocationEnabled(true);
+        webView.setWebViewClient(new GeoWebViewClient());
+        webView.setWebChromeClient(new GeoWebChromeClient());
 
-        view.loadUrl("http://stray.azurewebsites.net/explore.html");
+        webView.loadUrl("http://stray.azurewebsites.net/explore.html");
     }
 
     @Override
@@ -45,4 +77,6 @@ public class MainActivity extends Activity {
 
         return super.onOptionsItemSelected(item);
     }
+
+    private WebView webView;
 }
